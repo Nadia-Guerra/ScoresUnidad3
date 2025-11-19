@@ -1,6 +1,5 @@
 package com.nadiaguerra.scores_unidad3.presentation.viewmodels
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.nadiaguerra.scores_unidad3.data.Student
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,26 +9,19 @@ import kotlinx.coroutines.flow.update
 
 
 class StudentViewModel: ViewModel() {
-
     private val _studentList = MutableStateFlow<List<Student>>(emptyList())
     val studentList: StateFlow<List<Student>> = _studentList.asStateFlow()
-
-    private val _studentGroup = MutableStateFlow<Char?>(null)
     private var idCounter = 1
 
-    fun filterGroup(group: Char) {
-        _studentGroup.value = group
-    }
 
     fun createStudent(
-        id: Int,
         name: String,
         lastname: String,
         group: Char,
         score: Int
     ): Int {
         val newStudent = Student(
-            id = idCounter++,
+            id = idCounter,
             name = name,
             lastname = lastname,
             group = group,
@@ -49,7 +41,7 @@ class StudentViewModel: ViewModel() {
     fun deleteStudent(studentId: Int) {
         _studentList.update { currentList ->
             currentList.filterNot {
-                it.id = studentId
+                it.id == studentId
             }
         }
     }
@@ -63,9 +55,8 @@ class StudentViewModel: ViewModel() {
     ){
         _studentList.update { currentList ->
             currentList.map { student ->
-                if (student.id = studentId){
+                if (student.id == studentId){
                     student.copy(
-                        id = studentId,
                         name = newName,
                         lastname = newLastName,
                         group = newGroup,
@@ -77,5 +68,32 @@ class StudentViewModel: ViewModel() {
             }
         }
     }
+
+    fun filterByGroup(group: Char): List<Student>{
+        return _studentList.value.filter {it.group == group}
+    }
+
+    fun get3BestStudents(): List<Student>{
+        return _studentList.value
+            .sortedByDescending { it.score }
+            .take(3)
+    }
+
+    fun get3WorstStudents(): List<Student>{
+        return _studentList.value
+            .sortedBy { it.score }
+            .take(3)
+    }
+
+    fun getAllStudentsByGroup(): List<Char>{ // para mostrar el estudiante junto a su grupo, no modifica
+        // si se requiere una descripcion, ejemplo:
+        //val description = student.map { "${it.name} del grupo ${it.group}" }
+        return _studentList.value
+            .map{it.group}
+            .distinct() //elimina duplicados, asi como un group by en sql LKJJSKJSA
+            .sorted()
+    }
+
+
 
 }
