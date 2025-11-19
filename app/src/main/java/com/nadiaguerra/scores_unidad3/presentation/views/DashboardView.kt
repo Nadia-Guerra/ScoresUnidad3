@@ -1,30 +1,16 @@
 package com.nadiaguerra.scores_unidad3.presentation.views
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,59 +18,68 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.nadiaguerra.scores_unidad3.data.Student
+import com.nadiaguerra.scores_unidad3.presentation.viewmodels.StudentViewModel
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardView(navController: NavController){
+fun DashboardView(navController: NavController, viewModel: StudentViewModel = viewModel()) {
+    val studentList by viewModel.studentList.collectAsState()
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = {Text("Dashboard")})
+            CenterAlignedTopAppBar(
+                title = { Text("Dashboard") }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("Add") },
-                containerColor = MaterialTheme.colorScheme.primary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar estudainte")
+                Icon(Icons.Default.Add, contentDescription = "Agregar estudiante")
             }
         }
-    ){ paddingValues ->
+    ) { paddingValues ->
         ContentStudentView(
-            paddingValues = paddingValues
-           // onDelete = { student ->
-             //   viewModel.deleteStudent(student)
+            paddingValues = paddingValues,
+            studentList = studentList,
+            onDelete = { student ->
+                viewModel.deleteStudent(student.id)
+            },
+            onEdit = { studentId ->
+                navController.navigate("Edit/$studentId") //se va a la visra de editar estudiante basado en el id
             }
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ContentStudentView(
     paddingValues: PaddingValues,
     studentList: List<Student>,
-    onDelete: (Student) -> Unit
-){
+    onDelete: (Student) -> Unit, //recibe un estudainte y no regresa nada
+    onEdit: (Int) -> Unit //recibe el id del estudiante y no regresa nada
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
-    ){
+    ) {
         if (studentList.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No hay formularios registrados")
+                Text("No hay estudiantes registrados")
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(
                     items = studentList,
                     key = { it.id }
-                ) { student ->
+                ) { student -> //por cada estudiante que haya se hace lo demas
                     val deleteAction = SwipeAction(
                         onSwipe = { onDelete(student) },
                         icon = {
@@ -99,12 +94,13 @@ fun ContentStudentView(
                     )
 
                     SwipeableActionsBox(
-                        endActions = listOf(deleteAction)
+                        endActions = listOf(deleteAction) //la accion de deslizar de dercha a izquierda
                     ) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .clickable { onEdit(student.id) },
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
@@ -140,5 +136,4 @@ fun ContentStudentView(
             }
         }
     }
-}
 }
