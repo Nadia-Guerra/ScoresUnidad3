@@ -24,7 +24,7 @@ import me.saket.swipe.SwipeableActionsBox
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardView(navController: NavController, viewModel: StudentViewModel = viewModel()) {
+fun DashboardView(navController: NavController, viewModel: StudentViewModel) {
     val studentList by viewModel.studentList.collectAsState()
 
     Scaffold(

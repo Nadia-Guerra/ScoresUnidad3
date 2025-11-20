@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddView(navController: NavController, viewModel: StudentViewModel = viewModel()) {
+fun AddView(navController: NavController, viewModel: StudentViewModel) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
