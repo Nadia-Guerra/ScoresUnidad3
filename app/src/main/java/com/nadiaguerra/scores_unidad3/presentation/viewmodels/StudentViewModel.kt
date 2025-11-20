@@ -8,11 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
-class StudentViewModel: ViewModel() {
+class StudentViewModel : ViewModel() {
     private val _studentList = MutableStateFlow<List<Student>>(emptyList())
     val studentList: StateFlow<List<Student>> = _studentList.asStateFlow()
     private var idCounter = 1
-
 
     fun createStudent(
         name: String,
@@ -52,10 +51,10 @@ class StudentViewModel: ViewModel() {
         newLastName: String,
         newGroup: Char,
         newScore: Int
-    ){
+    ) {
         _studentList.update { currentList ->
             currentList.map { student ->
-                if (student.id == studentId){
+                if (student.id == studentId) {
                     student.copy(
                         name = newName,
                         lastname = newLastName,
@@ -69,31 +68,40 @@ class StudentViewModel: ViewModel() {
         }
     }
 
-    fun filterByGroup(group: Char): List<Student>{
-        return _studentList.value.filter {it.group == group}
+    fun filterByGroup(group: Char): List<Student> {
+        return _studentList.value.filter { it.group == group }
     }
 
-    fun get3BestStudents(): List<Student>{
+    fun get3BestStudents(): List<Student> {
         return _studentList.value
             .sortedByDescending { it.score }
             .take(3)
     }
 
-    fun get3WorstStudents(): List<Student>{
+    fun get3WorstStudents(): List<Student> {
         return _studentList.value
             .sortedBy { it.score }
             .take(3)
     }
 
-    fun getAllStudentsByGroup(): List<Char>{ // para mostrar el estudiante junto a su grupo, no modifica
+    fun getAllStudentsByGroup(): List<Char> { // para mostrar el estudiante junto a su grupo, no modifica
         // si se requiere una descripcion, ejemplo:
         //val description = student.map { "${it.name} del grupo ${it.group}" }
         return _studentList.value
-            .map{it.group}
+            .map { it.group }
             .distinct() //elimina duplicados, asi como un group by en sql LKJJSKJSA
             .sorted()
     }
 
+    fun getAverageScoresByGroup(group: Char): Double {
+        val students = _studentList.value.filter { it.group == group }
+
+        if (students.isEmpty()){
+            return 0.0
+        }
+        val totalScore = students.sumOf { it.score }
+        return totalScore.toDouble()/students.size
+    }
 
 
 }
