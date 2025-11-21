@@ -1,6 +1,7 @@
 package com.nadiaguerra.scores_unidad3.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,7 +14,7 @@ import com.nadiaguerra.scores_unidad3.presentation.views.DashboardView
 import com.nadiaguerra.scores_unidad3.presentation.views.EditView
 
 @Composable
-fun NavManager(){
+fun StudentNavManager(modifier: Modifier) {
     val navController = rememberNavController()
     val sharedViewModel: StudentViewModel = viewModel()
 
